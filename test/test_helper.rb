@@ -7,4 +7,7 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'hosebird'
 
 class Test::Unit::TestCase
+  def config
+    @config ||= YAML::load(open("#{ENV['HOME']}/.twitter"))
+  end
 end
