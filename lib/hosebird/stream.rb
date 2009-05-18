@@ -50,12 +50,12 @@ module Hosebird
       "Authorization: Basic #{["#{username}:#{password}"].pack('m').strip.gsub(NEWLINE, '')}"
     end
 
-    def callback(raw)
-      @callback.call(JSON.parse(raw).to_mash) unless @callback.nil?
+    def callback(json)
+      @callback.call(json) unless @callback.nil?
     end
 
-    def filter_non_json(lines)
-      lines.map {|line| line if line =~ JSON_START && line =~ JSON_END}.compact
+    def extract_json(lines)
+      lines.map {|line| JSON.parse(line).to_mash if line =~ JSON_START && line =~ JSON_END}.compact
     end
 
     def post_init
@@ -74,7 +74,7 @@ module Hosebird
         @buffer = lines.pop
       end
 
-      filter_non_json(lines).each {|line| callback(line)}
+      extract_json(lines).each {|line| callback(line)}
     end
   end
 end

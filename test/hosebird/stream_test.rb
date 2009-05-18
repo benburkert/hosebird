@@ -14,9 +14,9 @@ module Hosebird
       end
     end
 
-    context "#filter_non_json" do
-      test "should remove any lines that do not start or end with curly braces" do
-        assert_equal(%w[{"valid":"json"}], @stream.filter_non_json(<<-JSON.split(Stream::NEWLINE)))
+    context "#extract_json" do
+      test "should ignore any lines that do not start or end with curly braces" do
+        assert_equal(1, @stream.extract_json(<<-JSON.split(Stream::NEWLINE)).size)
 "missing": "braces"
 {"valid":"json"}
 "missing": "lcb"}

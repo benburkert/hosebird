@@ -15,7 +15,7 @@ module Hosebird
 
     def request
       body = post_params
-      <<-HTTP.gsub(NEWLINE, "\r\n")
+      <<-HTTP.chomp.gsub(NEWLINE, "\r\n")
 POST #{url} HTTP/1.1
 Host: #{HOST}
 #{authorization}
