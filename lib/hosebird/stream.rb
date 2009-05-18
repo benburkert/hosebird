@@ -5,6 +5,7 @@ module Hosebird
     HOST        = 'stream.twitter.com'
     PORT        = 80
     KEEP_ALIVE  = /\A[0-F]{3}\Z/
+    NEWLINE     = /[\n]/
     CRLF        = /[\r][\n]/
     EOF         = /[\r][\n]\Z/
     JSON_START  = /\A[{]/
@@ -12,7 +13,7 @@ module Hosebird
 
     class_inheritable_accessor :url
 
-    attr_accessor :twitter
+    attr_accessor :twitter, :timeout, :buffer
 
     def_delegators :twitter, :client
     def_delegators :client, :username, :password
@@ -46,7 +47,7 @@ module Hosebird
     end
 
     def basic_auth
-      "Authorization: Basic #{["#{username}:#{password}"].pack('m').strip.gsub(/\n/, '')}"
+      "Authorization: Basic #{["#{username}:#{password}"].pack('m').strip.gsub(NEWLINE, '')}"
     end
 
     def callback(raw)

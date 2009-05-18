@@ -14,6 +14,40 @@ module Hosebird
       end
     end
 
+    context "#filter_non_json" do
+      test "should remove any lines that do not start or end with curly braces" do
+        assert_equal(%w[{"valid":"json"}], @stream.filter_non_json(<<-JSON.split(Stream::NEWLINE)))
+"missing": "braces"
+{"valid":"json"}
+"missing": "lcb"}
+{"missing": "rcb"
+JSON
+      end
+    end
+
+    context "#receive_data" do
+      test "should empty the buffer if the data ends with a CRLF" do
+        @stream.buffer = ''
+        @stream.receive_data <<-JSON.gsub(Stream::NEWLINE, "\r\n")
+{"a": 1}
+{"b": 2}
+{"c": 3}
+JSON
+
+        assert(@stream.buffer.empty?)
+      end
+
+      test "should not be empty if the buffer does not end with a CRLF" do
+        @stream.buffer = ''
+        @stream.receive_data <<-JSON
+{"a": 1}\r
+{"b":
+JSON
+
+        assert(!@stream.buffer.empty?)
+      end
+    end
+
     context "#request" do
       test "should conform with RFC2616" do
         assert_match(/\AGET\s\/example\.json\sHTTP\/1\.1\r\n/m, @stream.request)

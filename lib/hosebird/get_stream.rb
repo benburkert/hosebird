@@ -10,12 +10,12 @@ module Hosebird
     end
 
     def request
-      <<-REQUEST.gsub(/[\n]/, "\r\n")
+      <<-HTTP.gsub(NEWLINE, "\r\n")
 GET #{url} HTTP/1.1
 Host: #{HOST}
 #{authorization}
 
-REQUEST
+HTTP
     end
   end
 end

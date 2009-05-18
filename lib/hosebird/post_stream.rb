@@ -15,7 +15,7 @@ module Hosebird
 
     def request
       body = post_params
-      <<-REQUEST.gsub(/[\n]/, "\r\n")
+      <<-HTTP.gsub(NEWLINE, "\r\n")
 POST #{url} HTTP/1.1
 Host: #{HOST}
 #{authorization}
@@ -23,7 +23,7 @@ Content-Type: application/x-www-form-urlencoded
 Content-Length: #{body.length}
 
 #{body}
-REQUEST
+HTTP
     end
   end
 end
