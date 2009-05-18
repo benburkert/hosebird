@@ -1,5 +1,7 @@
 module Hosebird
   class PostStream < Stream
+    attr_accessor :follow
+
     def initialize(twitter, follow, timeout = 300, *args, &blk)
       super
       blk = args.pop if blk.nil? && args.last.respond_to?(:call)
