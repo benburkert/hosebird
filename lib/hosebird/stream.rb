@@ -2,28 +2,33 @@ module Hosebird
   class Stream < EM::Connection
     extend Forwardable
 
-    HOST = 'stream.twitter.com'
-    PORT = 80
+    HOST        = 'stream.twitter.com'
+    PORT        = 80
+    KEEP_ALIVE  = /\A[0-F]{3}\Z/
+    CRLF        = /[\r][\n]/
+    EOF         = /[\r][\n]\Z/
+    JSON_START  = /\A[{]/
+    JSON_END    = /[}]\Z/
 
-    class_inheritable_accessor :url, :verb
+    class_inheritable_accessor :url
 
     attr_accessor :twitter
 
     def_delegators :twitter, :client
     def_delegators :client, :username, :password
 
-    def self.basic_auth(username, password)
-      connect(Twitter::Base.new(Twitter::HTTPAuth.new(username, password)))
+    def self.basic_stream(username, password, *args, &blk)
+      subscribe(Twitter::Base.new(Twitter::HTTPAuth.new(username, password)), *args, &blk)
     end
 
-    def self.connect(*args)
+    def self.connect(host = HOST, port = PORT, *args)
+      EM.connect(host, port, *args)
+    end
+
+    def self.subscribe(*args, &blk)
       with_event_loop do
-        EM.connect(HOST, PORT, self, *args)
+        connect(HOST, PORT, self, *(blk.nil? ? args : args << blk))
       end
-    end
-
-    def self.stream(twitter, &blk)
-      connect(twitter).stream(&blk)
     end
 
     def self.with_event_loop
@@ -32,11 +37,6 @@ module Hosebird
       else
         EM.run { yield if block_given? }
       end
-    end
-
-    def initialize(twitter, timeout = 20)
-      super
-      @twitter, @timeout = twitter, timeout
     end
 
     def authentication
@@ -49,7 +49,12 @@ module Hosebird
       "Authorization: Basic #{["#{username}:#{password}"].pack('m').strip.gsub(/\n/, '')}"
     end
 
-    def connection_completed
+    def callback(raw)
+      @callback.call(JSON.parse(raw).to_mash) unless @callback.nil?
+    end
+
+    def filter_non_json(lines)
+      lines.map {|line| line if line =~ JSON_START && line =~ JSON_END}.compact
     end
 
     def post_init
@@ -57,20 +62,18 @@ module Hosebird
       send_data request
     end
 
-    def request
-      <<-HTTP.gsub(/[\n]/m, "\r\n")
-#{verb.to_s.upcase} #{url} HTTP/1.1
-Host: #{HOST}
-#{authentication}
+    def receive_data(data)
+      @buffer << data
 
-HTTP
-    end
-  end
+      if @buffer =~ EOF
+        lines = @buffer.split(CRLF)
+        @buffer = ''
+      else
+        lines = @buffer.split(CRLF)
+        @buffer = lines.pop
+      end
 
-  def self.Stream(url, verb = :get)
-    Class.new(Stream) do
-      self.url = url
-      self.verb = verb
+      filter_non_json(lines).each {|line| callback(line)}
     end
   end
 end
