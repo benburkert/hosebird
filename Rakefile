@@ -5,11 +5,11 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "hosebird"
-    gem.summary = %Q{TODO}
+    gem.summary = %Q{A libary for Twitter's new Streaming API codename Hosebird.}
     gem.email = "ben@benburkert.com"
     gem.homepage = "http://github.com/benburkert/hosebird"
     gem.authors = ["Ben Burkert"]
-    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
+    gem.requirements = %w[eventmachine extlib json twitter]
   end
 
 rescue LoadError

@@ -1,0 +1,83 @@
+h1. hosebird
+
+h2. Overview
+
+Hosebird is a Ruby library for Twitter's new "Streaming API":http://apiwiki.twitter.com/Streaming-API-Documentation codename Hosebird. Hosebird will open a persistent HTTP connection which receives updates in near-realtime.
+
+For example, hosebird makes it easy to monitor twitter for caps lock abuse.
+<pre>
+<code>
+require 'hosebird'
+username, password = #...
+twitter = Twitter::Base.new(Twitter::HTTPAuth.new(username, password))
+
+Hosebird::Spritzer.subscribe(twitter) do |status|
+  if status[:text].upcase == status[:text] && status[:text] =~ /\w+/
+    twitter.update("@#{status[:user][:screen_name]} ur caps r on, btw", :in_reply_to_status_id => status[:id])
+  end
+end
+</code>
+</pre>
+
+h2. Installation
+
+h3. Requirements
+
+* "eventmachine":http://github.com/eventmachine/eventmachine/
+* "extlib":http://github.com/datamapper/extlib/
+* "json/json_pure":http://rubyforge.org/projects/json/
+* "twitter":http://github.com/jnunemaker/twitter/
+
+h3. Optional
+
+* "yajl-ruby":http://github.com/brianmario/yajl-ruby/ (Support Pending)
+
+h3. Installing from GitHub
+<pre>
+<code>
+sudo gem install benburkert-hosebird
+</code>
+</pre>
+
+h2. Examples
+
+h4. Growlr: A Realtime Twitter Client
+
+_Note: Requires OSX with Growl_
+
+h5. 1. Create a @~/.twitter@ YAML file with your twitter username & password:
+
+<pre>
+</code>
+echo "username: oprah
+password: harpo" > ~/.twitter
+</code>
+</pre>
+
+h5. 2. Install hosebird from GitHub:
+
+<pre>
+<code>
+sudo gem install benburkert-hosebird
+</code>
+</pre>
+
+h5. 3. Checkout the hosebird source:
+
+<pre>
+<code>
+git clone git://github.com/benburkert/hosebird.git
+</code>
+</pre>
+
+h5. 4. Run the growler example:
+
+<pre>
+<code>
+ruby hosebird/examples/growlr.rb
+</code>
+</pre>
+
+h4. Spritzr: Same as Growlr, but for the Public Timeline
+
+_Run @hosebird/examples/spritzr.rb@ instead of @hosebird/examples/growlr.rb@._

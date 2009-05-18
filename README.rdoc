@@ -1,7 +1,0 @@
-= hosebird
-
-Description goes here.
-
-== Copyright
-
-Copyright (c) 2009 Ben Burkert. See LICENSE for details.
