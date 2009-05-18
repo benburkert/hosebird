@@ -7,7 +7,10 @@ module Hosebird
 
     class_inheritable_accessor :url, :verb
 
-    attr_accessor :client
+    attr_accessor :twitter
+
+    def_delegators :twitter, :client
+    def_delegators :client, :username, :password
 
     def self.basic_auth(username, password)
       connect(Twitter::Base.new(Twitter::HTTPAuth.new(username, password)))
@@ -19,8 +22,8 @@ module Hosebird
       end
     end
 
-    def self.stream(client, &blk)
-      connect(client).stream(&blk)
+    def self.stream(twitter, &blk)
+      connect(twitter).stream(&blk)
     end
 
     def self.with_event_loop
@@ -31,13 +34,19 @@ module Hosebird
       end
     end
 
-    def initialize(client, timeout = 20)
+    def initialize(twitter, timeout = 20)
       super
-      @client, @timeout = client, timeout
+      @twitter, @timeout = twitter, timeout
     end
 
     def authentication
-      
+      case client
+      when Twitter::HTTPAuth then basic_auth
+      end
+    end
+
+    def basic_auth
+      "Authorization: Basic #{["#{username}:#{password}"].pack('m').strip.gsub(/\n/, '')}"
     end
 
     def connection_completed

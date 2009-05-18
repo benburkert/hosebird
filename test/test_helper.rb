@@ -8,6 +8,10 @@ require 'hosebird'
 
 class Test::Unit::TestCase
   def config
-    @config ||= YAML::load(open("#{ENV['HOME']}/.twitter"))
+    @config ||= YAML::load(open("#{ENV['HOME']}/.twitter")).to_mash
+  end
+
+  def twitter_connection
+    Twitter::Base.new(Twitter::HTTPAuth.new(config[:username], config[:password]))
   end
 end
