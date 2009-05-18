@@ -1,3 +1,4 @@
+require 'forwardable'
 require 'extlib'
 require 'eventmachine'
 
