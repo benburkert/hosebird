@@ -33,6 +33,7 @@ h3. Optional
 * "yajl-ruby":http://github.com/brianmario/yajl-ruby/ (Support Pending)
 
 h3. Installing from GitHub
+
 <pre>
 <code>
 sudo gem install benburkert-hosebird
