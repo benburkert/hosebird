@@ -76,5 +76,11 @@ module Hosebird
 
       extract_json(lines).each {|line| callback(line)}
     end
+
+    def unbind
+      close_connection
+      reconnect HOST, PORT
+      post_init
+    end
   end
 end
