@@ -54,15 +54,7 @@ password: harpo" > ~/.twitter
 </code>
 </pre>
 
-h5. 2. Install hosebird from GitHub:
-
-<pre>
-<code>
-sudo gem install benburkert-hosebird
-</code>
-</pre>
-
-h5. 3. Checkout the hosebird source:
+h5. 2. Checkout the hosebird source:
 
 <pre>
 <code>
@@ -70,7 +62,7 @@ git clone git://github.com/benburkert/hosebird.git
 </code>
 </pre>
 
-h5. 4. Run the growler example:
+h5. 3. Run the growler example:
 
 <pre>
 <code>
