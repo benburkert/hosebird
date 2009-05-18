@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
      "VERSION",
      "examples/growlr.rb",
      "examples/spritzr.rb",
+     "hosebird.gemspec",
      "lib/hosebird.rb",
      "lib/hosebird/autoload/json.rb",
      "lib/hosebird/autoload/twitter.rb",
@@ -36,7 +37,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/benburkert/hosebird}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.requirements = ["eventmachine", "extlib", "json", "twitter"]
+  s.requirements = ["aikidoka", "eventmachine", "extlib", "json", "twitter"]
   s.rubygems_version = %q{1.3.3}
   s.summary = %q{A libary for Twitter's new Streaming API codename Hosebird.}
   s.test_files = [

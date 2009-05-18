@@ -23,6 +23,7 @@ h2. Installation
 
 h3. Requirements
 
+* "aikidoka":http://github.com/flyingmachine/aikidoka/
 * "eventmachine":http://github.com/eventmachine/eventmachine/
 * "extlib":http://github.com/datamapper/extlib/
 * "json/json_pure":http://rubyforge.org/projects/json/
@@ -33,7 +34,6 @@ h3. Optional
 * "yajl-ruby":http://github.com/brianmario/yajl-ruby/ (Support Pending)
 
 h3. Installing from GitHub
-
 <pre>
 <code>
 sudo gem install benburkert-hosebird
