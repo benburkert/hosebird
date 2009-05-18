@@ -22,12 +22,12 @@ module Hosebird
     end
 
     def self.connect(host = HOST, port = PORT, *args)
-      EM.connect(host, port, *args)
+      EM.connect(host, port, self, *args)
     end
 
     def self.subscribe(*args, &blk)
       with_event_loop do
-        connect(HOST, PORT, self, *(blk.nil? ? args : args << blk))
+        connect(HOST, PORT, *(blk.nil? ? args : args << blk))
       end
     end
 
@@ -39,7 +39,7 @@ module Hosebird
       end
     end
 
-    def authentication
+    def authorization
       case client
       when Twitter::HTTPAuth then basic_auth
       end
