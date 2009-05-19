@@ -9,7 +9,7 @@ begin
     gem.email = "ben@benburkert.com"
     gem.homepage = "http://github.com/benburkert/hosebird"
     gem.authors = ["Ben Burkert"]
-    gem.requirements = %w[aikidoka eventmachine extlib json twitter]
+    gem.requirements = %w[flyingmachine-aikidoka eventmachine extlib json twitter]
   end
 
 rescue LoadError
