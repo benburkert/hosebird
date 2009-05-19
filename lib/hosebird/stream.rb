@@ -4,12 +4,20 @@ module Hosebird
 
     HOST        = 'stream.twitter.com'
     PORT        = 80
-    KEEP_ALIVE  = /\A[0-F]{3}\Z/
+    KEEP_ALIVE  = /\A3[\r][\n][\n][\r][\n]/
+    DECHUNKER   = /\A[0-F]+[\r][\n]/
     NEWLINE     = /[\n]/
     CRLF        = /[\r][\n]/
     EOF         = /[\r][\n]\Z/
-    JSON_START  = /\A[{]/
-    JSON_END    = /[}]\Z/
+
+    # %r{\AHTTP/1.1[\s]200[\s]OK[\r][\n](?:[a-zA-Z0-9/\\\:(.\-) ]+[\r][\n])+[\r][\n]}
+    RESPONSE_HEADER = <<-HTTP.gsub(NEWLINE, "\r\n")
+HTTP/1.1 200 OK
+Content-Type: application/json
+Transfer-Encoding: chunked
+Server: Jetty(6.1.14)
+
+HTTP
 
     class_inheritable_accessor :url
 
@@ -55,7 +63,12 @@ module Hosebird
     end
 
     def extract_json(lines)
-      lines.map {|line| JSON.parse(line).to_mash if line =~ JSON_START && line =~ JSON_END}.compact
+      # lines.map {|line| Yajl::Stream.parse(StringIO.new(line)).to_mash rescue nil }.compact
+      lines.map {|line| JSON.parse(line).to_mash rescue nil }.compact
+    end
+
+    def keep_alive?(data)
+      data =~ KEEP_ALIVE
     end
 
     def post_init
@@ -64,23 +77,32 @@ module Hosebird
     end
 
     def receive_data(data)
-      @buffer << data
+      data.gsub!(RESPONSE_HEADER, '')
 
-      if @buffer =~ EOF
-        lines = @buffer.split(CRLF)
-        @buffer = ''
-      else
-        lines = @buffer.split(CRLF)
-        @buffer = lines.pop
+      unless keep_alive?(data)
+        @buffer << unchunk(data)
+
+        if @buffer =~ EOF
+          lines = @buffer.split(CRLF)
+          @buffer = ''
+        else
+          lines = @buffer.split(CRLF)
+          @buffer = lines.pop
+        end
+
+        extract_json(lines).each {|line| callback(line)}
       end
-
-      extract_json(lines).each {|line| callback(line)}
     end
 
     def unbind
       close_connection
       reconnect HOST, PORT
       post_init
+    end
+
+    def unchunk(data)
+      data.gsub!(DECHUNKER, '')
+      data
     end
   end
 end
